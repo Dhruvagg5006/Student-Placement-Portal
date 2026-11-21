@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: leadflow
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 22.5.0
+      - key: DATABASE_PATH
+        value: /var/data/leads.db
+    disk:
+      name: leadflow-data
+      mountPath: /var/data
+      sizeGB: 1
