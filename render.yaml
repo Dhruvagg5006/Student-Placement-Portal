@@ -8,6 +8,6 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: 22.5.0
+        value: 24.22.1
       - key: DATABASE_PATH
         value: /tmp/leads.db
