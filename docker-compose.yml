@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:5000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=${DB_USER:-placement_user}
+      - DB_PASSWORD=${DB_PASSWORD:-placement_pass}
+      - DB_NAME=${DB_NAME:-placement_db}
+      - JWT_SECRET=${JWT_SECRET:-super_secret_jwt_key_change_me}
+      - NODE_ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=${DB_USER:-placement_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-placement_pass}
+      - POSTGRES_DB=${DB_NAME:-placement_db}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-placement_user} -d ${DB_NAME:-placement_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
